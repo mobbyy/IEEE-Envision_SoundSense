@@ -8,6 +8,12 @@ Implementation and comparative analysis of Time Domain Feature-based and Frequen
 
 Mentors:
 
+- ARYA SHEDBAL
+
+- ISHAAN BHARADWAJ
+
+- VEDANG PARANJAPE
+
 Mentees:
 
 - BACHEWAR SANKET TUKARAM
