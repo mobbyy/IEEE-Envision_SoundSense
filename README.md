@@ -1,6 +1,5 @@
-# IEEE-Envision_SoundSense
-## **ENVISION**
-### **D02 SOUNDSENSE**
+# IEEE-Envision
+## **D02 SOUNDSENSE**
 
 Implementation and comparative analysis of Time Domain Feature-based and Frequency Domain Feature-based ML models for instrument classification.
 
@@ -99,7 +98,6 @@ Feature extraction results: Time-domain feature extraction yielded 4 features pe
 Model performance on time-domain features: Support Vector Machine achieved 86.61% accuracy, k-Nearest Neighbors reached 89.43%, and Random Forest attained 89.31%. These results establish a baseline for time-domain classification capability, with k-Nearest Neighbours demonstrating superior performance on raw loudness and pitch characteristics.
 
 
-
 **Model performance on frequency-domain features:** 
 
 When trained on spectral representations, all three models showed substantial improvement: SVM improved to 92.47%, KNN reached 93.89%, and Random Forest achieved 92.74%. The significant gains across all algorithms confirm the superiority of frequency-domain representations for capturing instrument-specific acoustic signatures.
@@ -107,7 +105,21 @@ When trained on spectral representations, all three models showed substantial im
 
 Model performance on MFCCs: Support Vector Machine achieved 97.43% accuracy, k-Nearest Neighbors reached 96.28%, and Random Forest attained 97.59%
 
+Reasons for varying accuracies:
 
+The variance in accuracy among the instruments (like the high performance of Violin vs. the lower performance of Flute or Trumpet) usually comes down to the following reasons:
+
+ 1. Harmonic Richness vs. Pure Tones
+    
+ •Violin/Bass Guitar: These instruments produce complex waveforms with many distinct overtones (harmonics). This creates a very unique 'fingerprint' in the frequency domain and MFCCs, making them easy for the Random Forest to identify.
+
+•Flute: A flute produces a much 'purer' tone, meaning it has fewer harmonics. Because its spectral signature is simpler, it often gets confused with other high-pitched instruments or even background hiss/noise in your local recordings.
+
+3. The "Confusion of High-Pitched Instruments" It shows that Flute, Trumpet, and Piano were all frequently misidentified as Violin. This happens because:
+   
+•They all share a similar fundamental frequency range. 
+
+•If the model was trained on more Violin samples or if the Violin training data was more diverse, the model develops a 'bias,' essentially guessing 'Violin' whenever it sees a high-frequency sound it doesn't perfectly recognize.
 
 
 
@@ -117,6 +129,23 @@ Random Forest with MFCCs emerged as the optimal configuration, achieving 97.59% 
 Misclassification patterns: The confusion matrices revealed that acoustically similar instruments (violin/mandolin, piano/keyboard, trumpet/trombone) were the primary sources of error across all models. However, frequency-domain models significantly reduced confusion between these categories by exploiting harmonic differences imperceptible in time-domain aggregation. Percussive instruments (drums, cymbals, tambourine) showed near-perfect separation in frequency-domain models due to their distinctive spectral flux signatures.
 Signal processing insights: The project successfully demonstrates that signal representation is as critical as model selection in audio classification. While KNN performed reasonably well on time-domain features, Random Forest's superior generalization on frequency-domain features suggests that capturing spectral dynamics through STFT analysis and derived features provides a more stable feature space for ensemble methods.
 Conclusion: The MFCC-based Random Forest model is the most effective approach for instrument classification, achieving a top accuracy of 97.59%. This significantly outperforms the frequency-domain (93.89%) and time-domain (89.43%) models, proving that MFCCs provide the most distinct and robust feature set for identifying musical timbres.
+
+**SHORTCOMINGS**
+
+- Data Leakage & Generalisation: The Kaggle baseline dataset was claimed to be ML-optimized, but both random and sequential splitting led to artificially inflated scores due to structural audio overlap. Accuracy when tested on an independent out-of-distribution data set dropped to more realistic, real-world levels. We chose to continue with that.
+  
+- Class mismatch: The system was trained on 10 instrument categories, but the local testing environment only had 8 classes, leading to class-boundary friction.
+
+- The Drum Problem: Class-wise results showed that the Drum set category was the most detrimental to accuracy. Features like RMS, ZCR and Spectral Centroid are favouring harmonic sounds. Transient, percussive, non-harmonic drum hits are difficult to isolate because they don't really have pitch.
+
+- Downsampling Loss: Resampling to 16kHz to save RAM lost high frequency musical harmonics (important for cymbals and brass), limiting model performance.
+
+- Feature Averaging Loss: The collapse of dynamic and time varying audio signals to a single global mean and standard deviation removes all temporal progression of the instrument’s sound.
+
+- Silence Trimming Variability: Using an aggressive silence trimming (top_db=30) on the raw test files leads to significant changes in the computed feature values, when compared to the well-clipped training dataset.
+
+- Unequal Class Representation: The source dataset contained unequal numbers of samples for each instrument. This led to classifiers being biased towards the highly represented classes.
+
 
 **REFERENCES:**
 
